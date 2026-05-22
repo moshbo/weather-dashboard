@@ -6,6 +6,7 @@ const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 function SearchBar({ onSearch }) {
 	const [query, setQuery] = useState("");
 	const [suggestions, setSuggestions] = useState([]);
+	const [showSuggestions, setShowSuggestions] = useState(true);
 
 	useEffect(() => {
 		const timer = setTimeout(async () => {
@@ -29,6 +30,7 @@ function SearchBar({ onSearch }) {
 	function handleSelect(city) {
 		setQuery(city.name);
 		setSuggestions([]);
+		setShowSuggestions(false);
 		onSearch(city.name);
 	}
 
@@ -37,6 +39,7 @@ function SearchBar({ onSearch }) {
 		if (query) {
 			onSearch(query);
 			setSuggestions([]);
+			setShowSuggestions(false);
 		}
 	}
 
@@ -46,7 +49,11 @@ function SearchBar({ onSearch }) {
 				<input
 					type="text"
 					value={query}
-					onChange={(e) => setQuery(e.target.value)}
+					onChange={(e) => {
+						setQuery(e.target.value);
+						setShowSuggestions(true);
+					}}
+					onBlur={() => setTimeout(() => setSuggestions([]), 150)}
 					placeholder="Search city..."
 					className="flex-1 px-4 py-2 rounded-xl outline-none text-gray-800 shadow-md"
 				/>
@@ -58,7 +65,7 @@ function SearchBar({ onSearch }) {
 				</button>
 			</form>
 
-			{suggestions.length > 0 && (
+			{showSuggestions && suggestions.length > 0 && (
 				<ul className="absolute top-12 left-0 right-16 bg-white rounded-xl shadow-lg overflow-hidden z-10">
 					{suggestions.map((city, index) => (
 						<li
